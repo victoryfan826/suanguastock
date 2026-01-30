@@ -2,128 +2,117 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>易数起卦 - 智能量化版</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>易数起卦 - 手机优化版</title>
     <style>
         :root { --main-color: #8b0000; --bg-color: #f4f1ea; }
-        body { font-family: "PingFang SC", "STSong", serif; background: var(--bg-color); color: #333; display: flex; justify-content: center; padding: 20px; }
-        .card { background: #fff; width: 100%; max-width: 500px; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 8px solid var(--main-color); }
-        h2 { text-align: center; color: var(--main-color); margin-bottom: 5px; }
-        .subtitle { text-align: center; font-size: 14px; color: #888; margin-bottom: 25px; }
-        .input-group { margin-bottom: 20px; }
-        label { display: block; font-size: 14px; margin-bottom: 8px; color: #555; font-weight: bold; }
-        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; transition: 0.3s; }
-        input:focus { border-color: var(--main-color); outline: none; box-shadow: 0 0 5px rgba(139,0,0,0.2); }
-        .btn-box { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
-        button { padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 15px; transition: 0.3s; }
-        .btn-auto { background: #555; color: white; }
-        .btn-manual { background: var(--main-color); color: white; }
-        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        body { font-family: "PingFang SC", "STSong", serif; background: var(--bg-color); color: #333; margin: 0; padding: 10px; display: flex; justify-content: center; }
+        .card { background: #fff; width: 100%; max-width: 450px; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 5px solid var(--main-color); }
+        h2 { text-align: center; color: var(--main-color); margin: 5px 0; font-size: 20px; }
+        .subtitle { text-align: center; font-size: 12px; color: #888; margin-bottom: 15px; }
         
-        #result-area { margin-top: 30px; padding-top: 20px; border-top: 2px dashed #eee; display: none; }
-        .price-tag { font-size: 14px; color: #777; margin-bottom: 10px; }
-        .gua-name { font-size: 24px; font-weight: bold; color: var(--main-color); margin-bottom: 15px; letter-spacing: 2px; }
-        .fortune-section { background: #fff9f9; padding: 20px; border-left: 4px solid var(--main-color); margin: 15px 0; border-radius: 0 8px 8px 0; }
-        .section-label { font-weight: bold; color: var(--main-color); margin-bottom: 5px; display: block; }
-        .content-text { line-height: 1.6; font-size: 16px; }
+        /* 输入区域紧凑化 */
+        .input-group { margin-bottom: 12px; }
+        label { display: block; font-size: 13px; margin-bottom: 5px; color: #555; font-weight: bold; }
+        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 15px; }
+        
+        .btn-box { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; }
+        button { padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; color: white; transition: 0.2s; }
+        .btn-auto { background: #666; }
+        .btn-manual { background: var(--main-color); }
 
-        .instruction-box { margin-top: 25px; padding: 15px; background: #fdfdfd; border: 1px solid #eee; border-radius: 8px; font-size: 13px; color: #666; }
-        .instruction-box h4 { margin: 0 0 10px 0; color: #8b0000; font-size: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-        .instruction-box ol { padding-left: 20px; margin: 0; }
-        .instruction-box li { margin-bottom: 8px; line-height: 1.5; }
+        /* 结果区域 */
+        #result-area { margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee; display: none; scroll-margin-top: 20px; }
+        .price-tag { font-size: 13px; color: #888; }
+        .gua-name { font-size: 22px; font-weight: bold; color: var(--main-color); margin: 10px 0; }
+        .fortune-section { background: #fffafa; padding: 12px; border-left: 3px solid var(--main-color); margin-bottom: 10px; border-radius: 4px; }
+        .section-label { font-weight: bold; color: var(--main-color); font-size: 14px; display: block; margin-bottom: 4px; }
+        .content-text { line-height: 1.5; font-size: 15px; }
+
+        /* 说明文字紧凑化 */
+        .instruction-box { margin-top: 15px; padding: 10px; background: #fafafa; border-radius: 6px; border: 1px solid #eee; }
+        .instruction-box h4 { margin: 0 0 5px 0; font-size: 13px; color: var(--main-color); }
+        .instruction-box ol { padding-left: 18px; margin: 0; font-size: 12px; color: #666; }
+        .instruction-box li { margin-bottom: 3px; }
         
-        .disclaimer { font-size: 12px; color: #aaa; text-align: center; margin-top: 30px; line-height: 1.6; border-top: 1px solid #eee; padding-top: 15px; }
+        .disclaimer { font-size: 11px; color: #bbb; text-align: center; margin-top: 15px; }
     </style>
 </head>
 <body>
 
 <div class="card">
     <h2>易数起卦</h2>
-    <div class="subtitle">收盘价格定乾坤 · 易理财富寻先机</div>
+    <div class="subtitle">收盘定乾坤 · 易理寻先机</div>
     
     <div class="input-group">
-        <label>1. 输入股票代码 (纯数字或美股代码)</label>
-        <input type="text" id="stockCode" placeholder="例如: 600519 或 TSLA">
+        <label>股票代码 (自动识别中/美股)</label>
+        <input type="text" id="stockCode" placeholder="如: 600519 或 TSLA">
     </div>
 
     <div class="input-group">
-        <label>2. 确认当日收盘价格 (自动获取或手动输入)</label>
-        <input type="number" id="manualPrice" step="0.01" placeholder="价格将在此处回显">
+        <label>确认价格 (手动输入或自动抓取)</label>
+        <input type="number" id="manualPrice" step="0.01" placeholder="收盘价将显示在此">
     </div>
 
     <div class="btn-box">
-        <button class="btn-auto" onclick="fetchStockData()">智能抓取价格</button>
-        <button class="btn-manual" onclick="calculateByManual()">确认收盘价格</button>
-    </div>
-
-    <div class="instruction-box">
-        <h4>起卦严正说明</h4>
-        <ol>
-           <li><strong>收盘为准</strong>：必须以当日或当周收盘价为基准，绝不能用即时价。</li>  
-           <li><strong>凝神静气</strong>：起卦前全身放松，至少保持一分钟凝神静气，默默感应。</li>
-            <li><strong>不可频测</strong>：同一股票不能频繁测试，首测感应最强。</li>
-            <li><strong>变爻意义</strong>：本卦为现状，变爻为转机或应对策略的建议。</li>
-        </ol>
+        <button class="btn-auto" onclick="fetchStockData()">抓取价格</button>
+        <button class="btn-manual" onclick="calculateByManual()">确认起卦</button>
     </div>
 
     <div id="result-area">
         <div id="price-display" class="price-tag"></div>
         <div id="gua-display" class="gua-name"></div>
+        
         <div class="fortune-section">
             <span class="section-label">【目前股运解读】</span>
             <div id="gua-fortune" class="content-text"></div>
         </div>
-        <div class="fortune-section" style="border-left-color: #555;">
-            <span class="section-label" style="color: #555;">【变爻趋势预测】</span>
+        
+        <div class="fortune-section" style="border-left-color: #444;">
+            <span class="section-label" style="color: #444;">【变爻趋势预测】</span>
             <div id="change-fortune" class="content-text"></div>
         </div>
     </div>
 
-    <div class="disclaimer">
-        本站内容源自传统易理，仅供娱乐参考。投资有风险。
+    <div class="instruction-box">
+        <h4>起卦须知</h4>
+        <ol>
+            <li>静心一分钟，默念标的代码感应。</li>
+            <li><strong>必须使用当日收盘价</strong>，不可用即时价。</li>
+            <li>变爻代表转机与应对策略（高岛易断精要）。</li>
+        </ol>
     </div>
+
+    <div class="disclaimer">仅供娱乐参考，投资有风险。</div>
 </div>
 
 <script>
-    // 自动识别后缀的逻辑
+    // 智能后缀匹配
     function formatStockCode(code) {
         code = code.toUpperCase().trim();
-        // 如果已经是美股字母代码，或者已经带了点号后缀，直接返回
         if (/^[A-Z]+$/.test(code) || code.includes('.')) return code;
-        
-        // 如果是纯数字，判断开头
         if (/^\d+$/.test(code)) {
-            if (code.startsWith('60') || code.startsWith('68') || code.startsWith('11')) return code + '.SS'; // 沪市
-            if (code.startsWith('00') || code.startsWith('30') || code.startsWith('12')) return code + '.SZ'; // 深市
-            if (code.startsWith('43') || code.startsWith('83') || code.startsWith('87') || code.startsWith('92')) return code + '.BJ'; // 北交所
+            if (code.startsWith('60') || code.startsWith('68') || code.startsWith('11')) return code + '.SS';
+            if (code.startsWith('00') || code.startsWith('30') || code.startsWith('12')) return code + '.SZ';
+            if (code.startsWith('43') || code.startsWith('83') || code.startsWith('87')) return code + '.BJ';
         }
         return code;
     }
 
     async function fetchStockData() {
         const rawCode = document.getElementById('stockCode').value.trim();
-        if(!rawCode) return alert("请输入股票代码");
+        if(!rawCode) return alert("请输入代码");
         
         const formattedCode = formatStockCode(rawCode);
-        const btn = document.querySelector('.btn-auto');
-        btn.innerText = "获取中...";
-
         try {
             const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/'+formattedCode)}`);
             const json = await res.json();
             const data = JSON.parse(json.contents);
-            
             if (data.chart.result) {
                 const price = data.chart.result[0].meta.regularMarketPrice;
                 document.getElementById('manualPrice').value = price.toFixed(2);
-                btn.innerText = "智能抓取价格";
-            } else {
-                throw new Error();
-            }
-        } catch (e) {
-            btn.innerText = "智能抓取价格";
-            alert("抓取失败。请核对代码是否正确，或尝试手动输入收盘价。");
-        }
+            } else { alert("未找到该股票价格"); }
+        } catch (e) { alert("网络抓取失败，请手动输入价格。"); }
     }
 
     async function runDivination(price) {
@@ -139,8 +128,7 @@
         let change = parseInt(decimalPart[1]) % 6 || 6;
 
         const guaId = `${upper}${lower}`;
-        document.getElementById('result-area').style.display = 'block';
-        document.getElementById('price-display').innerText = `收盘基数：${priceStr}`;
+        const resultArea = document.getElementById('result-area');
         
         try {
             const response = await fetch('data.json');
@@ -148,27 +136,25 @@
             const currentGua = allData[guaId];
 
             if(currentGua) {
+                resultArea.style.display = 'block';
+                document.getElementById('price-display').innerText = `收盘基数：${priceStr}`;
                 document.getElementById('gua-display').innerText = `${currentGua.name} (第${change}爻变)`;
                 document.getElementById('gua-fortune').innerText = currentGua.fortune;
                 document.getElementById('change-fortune').innerText = currentGua.lines[change-1] || "趋势研判中...";
+                
+                // 核心优化：平滑滚动到结果区
+                resultArea.scrollIntoView({ behavior: 'smooth' });
             }
-        } catch (error) {
-            alert("数据加载失败，请确保 data.json 文件存在。");
-        }
+        } catch (error) { alert("加载数据失败，请确认 data.json 格式正确。"); }
     }
 
     function calculateByManual() {
         const price = document.getElementById('manualPrice').value;
-        if(!price) return alert("请先获取或输入价格");
+        if(!price) return alert("请先输入价格");
         document.getElementById('stockCode').value = ''; 
         runDivination(price);
     }
-
-    document.getElementById('stockCode').addEventListener('keypress', (e) => { if (e.key === 'Enter') fetchStockData(); });
 </script>
 
 </body>
 </html>
-
-
-
