@@ -50,13 +50,13 @@
     </div>
 
     <div class="input-group">
-        <label>确认价格 (手动输入或自动抓取)</label>
+        <label>确认收盘价格 (手动输入或自动抓取)</label>
         <input type="number" id="manualPrice" step="0.01" placeholder="收盘价将显示在此">
     </div>
 
     <div class="btn-box">
-        <button class="btn-auto" onclick="fetchStockData()">抓取价格</button>
-        <button class="btn-manual" onclick="calculateByManual()">确认起卦</button>
+        <button class="btn-auto" onclick="fetchStockData()">自动抓取价格</button>
+        <button class="btn-manual" onclick="calculateByManual()">确认收盘价格</button>
     </div>
 
     <div id="result-area">
@@ -158,3 +158,4 @@
 
 </body>
 </html>
+
