@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>美股易数起卦 - 玄学量化版</title>
+    <style>
+        :root { --main-color: #8b0000; --bg-color: #f4f1ea; }
+        body { font-family: "PingFang SC", "STSong", serif; background: var(--bg-color); color: #333; display: flex; justify-content: center; padding: 20px; }
+        .card { background: #fff; width: 100%; max-width: 500px; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 8px solid var(--main-color); }
+        h2 { text-align: center; color: var(--main-color); margin-bottom: 5px; }
+        .subtitle { text-align: center; font-size: 14px; color: #888; margin-bottom: 25px; }
+        .input-group { margin-bottom: 20px; }
+        label { display: block; font-size: 14px; margin-bottom: 8px; color: #555; font-weight: bold; }
+        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; transition: 0.3s; }
+        input:focus { border-color: var(--main-color); outline: none; box-shadow: 0 0 5px rgba(139,0,0,0.2); }
+        .btn-box { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
+        button { padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 15px; transition: 0.3s; }
+        .btn-auto { background: var(--main-color); color: white; }
+        .btn-manual { background: #555; color: white; }
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        
+        #result-area { margin-top: 30px; padding-top: 20px; border-top: 2px dashed #eee; display: none; animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .price-tag { font-size: 14px; color: #777; margin-bottom: 10px; }
+        .gua-name { font-size: 24px; font-weight: bold; color: var(--main-color); margin-bottom: 15px; letter-spacing: 2px; }
+        .fortune-section { background: #fff9f9; padding: 20px; border-left: 4px solid var(--main-color); margin: 15px 0; border-radius: 0 8px 8px 0; }
+        .section-label { font-weight: bold; color: var(--main-color); margin-bottom: 5px; display: block; }
+        .content-text { line-height: 1.6; font-size: 16px; }
+        
+        .disclaimer { font-size: 12px; color: #aaa; text-align: center; margin-top: 40px; line-height: 1.6; border-top: 1px solid #eee; padding-top: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>美股易数起卦</h2>
+    <div class="subtitle">收盘价格定乾坤 · 易理财富寻先机</div>
+    
+    <div class="input-group">
+        <label>自动模式：输入美股代码</label>
+        <input type="text" id="stockCode" placeholder="例如: TSLA, AAPL, NVDA">
+    </div>
+
+    <div class="input-group">
+        <label>手动模式：输入当日收盘价</label>
+        <input type="number" id="manualPrice" step="0.01" placeholder="例如: 188.25">
+    </div>
+
+    <div class="btn-box">
+        <button class="btn-auto" onclick="fetchStockData()">自动抓取价格</button>
+        <button class="btn-manual" onclick="calculateByManual()">手动价格起卦</button>
+    </div>
+
+    <div id="result-area">
+        <div id="price-display" class="price-tag"></div>
+        <div id="gua-display" class="gua-name"></div>
+        
+        <div class="fortune-section">
+            <span class="section-label">【今日财运解读】</span>
+            <div id="gua-fortune" class="content-text"></div>
+        </div>
+        
+        <div class="fortune-section" style="border-left-color: #555;">
+            <span class="section-label" style="color: #555;">【变爻趋势预测】</span>
+            <div id="change-fortune" class="content-text"></div>
+        </div>
+    </div>
+
+    <div class="disclaimer">
+        本站内容源自传统易理典籍整理，仅供娱乐参考。<br>
+        投资有风险，起卦不作为买卖依据。
+    </div>
+</div>
+
+<script>
+    // 1. 核心起卦逻辑
+    async function runDivination(price) {
+        const priceStr = parseFloat(price).toFixed(2);
+        const parts = priceStr.split('.');
+        const integerPart = parts[0]; 
+        const decimalPart = parts[1];
+
+        // 上卦：整数各位数相加 % 8
+        let sum = 0;
+        for(let char of integerPart) {
+            if(!isNaN(char)) sum += parseInt(char);
+        }
+        let upper = sum % 8 || 8;
+
+        // 下卦：小数点第一位 % 8
+        let lower = parseInt(decimalPart[0]) % 8 || 8;
+
+        // 变爻：小数点第二位 % 6
+        let change = parseInt(decimalPart[1]) % 6 || 6;
+
+        // 组合ID，如 "11", "88"
+        const guaId = `${upper}${lower}`;
+        
+        // 显示基础信息
+        document.getElementById('result-area').style.display = 'block';
+        document.getElementById('price-display').innerText = `收盘基数：$${priceStr}`;
+        
+        // 尝试从 data.json 读取内容
+        try {
+            const response = await fetch('data.json');
+            if (!response.ok) throw new Error('找不到 data.json');
+            const allData = await response.json();
+            const currentGua = allData[guaId];
+
+            if(currentGua) {
+                document.getElementById('gua-display').innerText = `${currentGua.name} (第${change}爻变)`;
+                document.getElementById('gua-fortune').innerText = currentGua.fortune;
+                // 注意：JSON里lines是数组，索引从0开始，所以要减1
+                document.getElementById('change-fortune').innerText = currentGua.lines[change-1] || "趋势研判中...";
+            } else {
+                document.getElementById('gua-display').innerText = "起卦成功";
+                document.getElementById('gua-fortune').innerText = "未在数据库中找到该卦对应文字，请检查 data.json 内容。";
+            }
+        } catch (error) {
+            console.error(error);
+            document.getElementById('gua-display').innerText = "起卦成功";
+            document.getElementById('gua-fortune').innerText = "无法加载 data.json 文件。请确保该文件与网页在同一文件夹下。";
+        }
+    }
+
+    // 2. 自动抓取函数 (通过开源接口)
+    async function fetchStockData() {
+        const code = document.getElementById('stockCode').value.trim();
+        if(!code) return alert("请输入股票代码");
+        
+        document.getElementById('gua-display').innerText = "正在向天地借数...";
+        document.getElementById('result-area').style.display = 'block';
+
+        try {
+            // 注意：美股接口由于CORS限制，这里建议手动输入。此处演示逻辑：
+            const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/'+code)}`);
+            const json = await res.json();
+            const data = JSON.parse(json.contents);
+            const price = data.chart.result[0].meta.regularMarketPrice;
+            runDivination(price);
+        } catch (e) {
+            alert("自动获取失败（美股数据接口海外限制），请使用手动模式输入价格。");
+        }
+    }
+
+    // 3. 手动触发函数
+    function calculateByManual() {
+        const price = document.getElementById('manualPrice').value;
+        if(!price) return alert("请输入价格");
+        runDivination(price);
+    }
+</script>
+
+</body>
+</html>
